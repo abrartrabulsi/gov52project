@@ -1,0 +1,15 @@
+These will be my notes from office hours and anything else important:
+
+2/28/2022 -- OH
+
+The data are actually aggregated averages. I need to look into regressing on aggregated data (weights, weighted least squares)
+
+How to address outliers: 
+Top coding is an option ie. everything over a certain number is just that number (everything over 100 is just 100)
+You can also convert things to a percentile
+
+Residuals:
+Check residuals for this, should be normal or at least roughly normal, if not normal, top code
+
+General Org:
+Eliminate college tiers you don't need. This will make prediction more accurate (removing outliersand unnecessary data points)

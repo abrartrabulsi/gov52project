@@ -1,0 +1,75 @@
+---
+title: "model building"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(haven)
+```
+```{r loading data}
+x <- read_dta("mrc_table8.dta")
+```
+```{r data cleaning}
+x <- x %>%
+  mutate(tier = as.factor(tier))
+```
+# Linear Models
+```{r model 1 -- basic}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x), .6*nrow(x)) 
+training <- x[index, ]
+test <- x[-index, ]
+
+# creating test/train data split
+
+m1 <- lm(k_mean ~ par_mean + tier, data = training)
+preds <- predict(m1, test)
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+```
+```{r model 2 -- logs}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x), .6*nrow(x)) 
+training <- x[index, ]
+test <- x[-index, ]
+
+# creating test/train data split
+
+m2 <- lm(log(k_mean) ~ log(par_mean) + tier, data = training)
+preds <- exp(predict(m2, test))
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+# for ease of comparing predictions and actual values
+
+# these data have outliers...especially when it comes to those who went to ivies but had impoverished parents with significantly low incomes (relative) the model is doing well for most other data points. what is a good model that can have decent accuracy for outliers too?
+```
+```{r model 3 -- interactions}
+set.seed(100)
+
+index <- sample(1:nrow(x), .6*nrow(x))
+training <- x[index, ]
+test <- x[-index, ]
+
+m3 <- lm(log(k_mean) ~ log(par_mean)*tier, data = training)
+preds3 <- exp(predict(m3, test))
+
+eval3 <- cbind(test$k_mean, preds3)
+colnames(eval3) <- c('Actual', 'Predicted')
+eval3 <- as.data.frame(eval3)
+eval3
+# the model has only been slightly improved with the introduction of an interaction term
+```
+

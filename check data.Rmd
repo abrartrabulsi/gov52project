@@ -1,0 +1,119 @@
+---
+title: "checking data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+library(haven)
+library(ggplot2)
+```
+```{r}
+x <- read_dta("mrc_table8.dta")
+```
+```{r}
+x %>%
+  ggplot(aes(x = par_mean, y = k_mean)) +
+  geom_point() +
+  facet_wrap(~ cohort)
+```
+```{r}
+x %>%
+  ggplot(aes(x = par_mean, y = k_mean)) +
+  geom_point()
+```
+```{r}
+x %>%
+  ggplot(aes(x = par_mean, y = tier)) +
+  geom_point()
+```
+
+```{r}
+x %>%
+  ggplot(aes(x = par_mean)) +
+  geom_histogram()
+```
+```{r}
+x %>%
+  ggplot(aes(x = tier)) +
+  geom_histogram()
+```
+```{r}
+x %>%
+  ggplot(aes(x = k_mean)) +
+  geom_histogram()
+```
+```{r}
+m1 <- lm(log(k_mean) ~ log(par_mean) + tier, data = x)
+print(m1)
+summary(m1)
+```
+```{r trying to machine learn}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x), .6*nrow(x)) 
+training <- x[index, ]
+test <- x[-index, ]
+
+# creating test/train data split
+
+m2 <- lm(log(k_mean) ~ log(par_mean) + tier, data = training)
+preds <- exp(predict(m2, test))
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+# for ease of comparing predictions and actual values
+
+# these data have outliers...especially when it comes to those who went to ivies but had impoverished parents with significantly low incomes (relative) the model is doing well for most other data points. what is a good model that can have decent accuracy for outliers too?
+```
+```{r}
+summary(m2)
+x <- x %>%
+  mutate(tier = as.factor(tier))
+```
+top coding is an option ie. everything over a certain number is just that number (everything over 100 is just 100)
+you can also convert things to a percentile
+add wieghts, weighted least squares
+```{r again with interaction term}
+set.seed(100)
+
+index <- sample(1:nrow(x), .6*nrow(x))
+training <- x[index, ]
+test <- x[-index, ]
+
+m3 <- lm(log(k_mean) ~ log(par_mean)*tier, data = training)
+preds3 <- exp(predict(m3, test))
+
+eval3 <- cbind(test$k_mean, preds3)
+colnames(eval3) <- c('Actual', 'Predicted')
+eval3 <- as.data.frame(eval3)
+eval3
+
+summary(m3)
+# the model has only been slightly improved with the introduction of an interaction term
+```
+```{r}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x), .6*nrow(x)) 
+training <- x[index, ]
+test <- x[-index, ]
+
+# creating test/train data split
+
+m4 <- lm(k_mean ~ par_mean + tier, data = training)
+preds <- predict(m4, test)
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+```
+check residuals for this, should be normal or at least roughly normal, if not normal, top code,  eliminate tiers you don't need
+
+
