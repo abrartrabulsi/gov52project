@@ -13,3 +13,24 @@ Check residuals for this, should be normal or at least roughly normal, if not no
 
 General Org:
 Eliminate college tiers you don't need. This will make prediction more accurate (removing outliersand unnecessary data points)
+
+
+Some questions/issues I'm running into:
+
+*** is including these numbers really doing much? am I doing it wrong? is this what's even supposed to be in the weights = argument? 
+
+This is what the R help page for lm() says: "an optional vector of weights to be used in the fitting process. Should be NULL or a numeric vector. If non-NULL, weighted least squares is used with weights weights (that is, minimizing sum(w*e^2)); otherwise ordinary least squares is used"
+
+Also, which of the variables should be used? There are different "counts"
+
+count: Number of kids in cohort-par_ventile-tier cell
+tot_count: Number of kids in the cohort-tier
+density: Fraction of kids in each par_ventile by tier and cohort (parent income distribution, defined as count/tot_count)
+
+For whatever reason "density" gives the best predictive results of the three, but happening to give the best predictive results isn't a good enough criterion to use something (I want to understand)
+
+*** how to top code case_when it not working
+*** nvm replace() worked
+
+*** address residual problem...without log transformations the residual plot is BAD even though the predictions are really good...with log transformations residual plot is passable but predictions are worse
+

@@ -9,11 +9,13 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 library(haven)
+library(devtools)
+library(aggregress)
 ```
 ```{r loading data}
 x <- read_dta("mrc_table8.dta")
 ```
-```{r data cleaning}
+```{r initial data cleaning}
 x <- x %>%
   mutate(tier = as.factor(tier))
 ```
@@ -72,4 +74,250 @@ eval3 <- as.data.frame(eval3)
 eval3
 # the model has only been slightly improved with the introduction of an interaction term
 ```
+```{r trying with weights?}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x), .6*nrow(x)) 
+training <- x[index, ]
+test <- x[-index, ]
+
+# creating test/train data split
+
+m4 <- lm(k_mean ~ par_mean + tier, data = training, weights = density)
+preds <- predict(m4, test)
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+```
+```{r some more data cleaning}
+x1 <- x %>%
+  filter(tier != c('9')) %>%
+  filter(tier != c('10')) %>%
+  filter(tier != c('11')) %>%
+  filter(tier != c('12')) %>%
+  filter(tier != c('13')) %>%
+  filter(tier != c('14'))
+
+# for whatever reason R wasn't filtering everything properly when I tried to pass multiple "or" arguments with | 
+```
+# Linear models with filtered data (variables of interest)
+```{r model 1 -- basic}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x1), .6*nrow(x1)) 
+training <- x1[index, ]
+test <- x1[-index, ]
+
+# creating test/train data split
+
+n1 <- lm(k_mean ~ par_mean + tier, data = training)
+preds <- predict(n1, test)
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+# the model got better!!!!!!!!! let's see a summary
+
+summary(n1)
+
+# rsquared is pretty decent too :)
+```
+```{r model 2 -- weights (???)}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x1), .6*nrow(x1)) 
+training <- x1[index, ]
+test <- x1[-index, ]
+
+# creating test/train data split
+
+n2 <- lm(k_mean ~ par_mean + tier, data = training, weights = density)
+preds <- predict(n2, test)
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+# slightly improved!!! yay 
+# now let's see a summary
+
+summary(n2)
+
+# pretty good.. should I be concerned that all the values are extremely small decimals? using 'e' etc
+
+# these values are getting REALLY good however they're all still lower than the "actual"..every single one which I thought was solved earlier from using a general linear model. The basic linear model (m1) still produces  predicted results that are higher at some data points, not sure what's going on with these ones
+```
+```{r residual plot}
+res <- resid(n2)
+plot(fitted(n2), res)
+
+# this residual plot...omg...this is a mess. this needs to be transformed
+```
+```{r model 3 -- transformed + weights}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x1), .6*nrow(x1)) 
+training <- x1[index, ]
+test <- x1[-index, ]
+
+# creating test/train data split
+
+n3 <- lm(log(k_mean) ~ log(par_mean) + tier, data = training, weights = density)
+preds <- exp(predict(n3, test))
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+```
+# Top coding the data
+```{r top coding}
+x1 %>%
+  mutate(par_mean = case_when(par_mean >= 1000000 ~ 1000000))
+
+# top coding with case_when it not working even when I convert to a numeric or integer vector
+
+x2 <- x1 %>%
+  mutate(par_mean = replace(par_mean, par_mean>=1000000, 1000000))
+
+# replace seems to have worked. let's check it.
+```
+```{r model 1 -- quick check of top-code}
+x2 %>%
+  ggplot(aes(x = par_mean)) +
+  geom_histogram()
+```
+```{r model 1 -- top coded}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x2), .6*nrow(x2)) 
+training <- x2[index, ]
+test <- x2[-index, ]
+
+# creating test/train data split
+
+l1 <- lm(k_mean ~ par_mean + tier, data = training, weights = density)
+preds <- predict(l1, test)
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+summary(l1)
+```
+```{r check residuals l1}
+res <- resid(l1)
+plot(fitted(l1), res)
+
+# still bad
+```
+```{r model 2 -- top code + transform dep}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x2), .6*nrow(x2)) 
+training <- x2[index, ]
+test <- x2[-index, ]
+
+# creating test/train data split
+
+l2 <- lm(log(k_mean) ~ par_mean + tier, data = training, weights = density)
+preds <- exp(predict(l2, test))
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+summary(l2)
+```
+```{r check residuals l2}
+res <- resid(l2)
+plot(fitted(l2), res)
+```
+```{r}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x2), .6*nrow(x2)) 
+training <- x2[index, ]
+test <- x2[-index, ]
+
+# creating test/train data split
+
+l3 <- lm(log(k_mean) ~ log(par_mean) + tier, data = training, weights = density)
+preds <- exp(predict(l3, test))
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+summary(l3)
+```
+```{r checking residuals l3}
+res <- resid(l3)
+plot(fitted(l3), res)
+
+# finally looks more like what a residual plot should look like
+```
+# Another round of top coding, this time for both k_mean and par_mean
+```{r}
+x3 <- x2 %>%
+  mutate(k_mean = replace(k_mean, k_mean>=150000, 150000))
+```
+```{r model 1 -- top code}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x3), .6*nrow(x3)) 
+training <- x3[index, ]
+test <- x3[-index, ]
+
+# creating test/train data split
+
+a1 <- lm(k_mean ~ par_mean + tier, data = training, weights = density)
+preds <- predict(a1, test)
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+summary(a1)
+```
+```{r checking residuals -- a1}
+res <- resid(a1)
+plot(fitted(a1), res)
+
+# still bad.
+```
+```{r model 2 -- top code + transformation}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x3), .6*nrow(x3)) 
+training <- x3[index, ]
+test <- x3[-index, ]
+
+# creating test/train data split
+
+a2 <- lm(log(k_mean) ~ log(par_mean) + tier, data = training, weights = density)
+preds <- exp(predict(a2, test))
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+summary(a2)
+```
+```{r checking residuals}
+res <- resid(a2)
+plot(fitted(a2), res)
+```
+
+
 
