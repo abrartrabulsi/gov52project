@@ -240,7 +240,7 @@ summary(l2)
 res <- resid(l2)
 plot(fitted(l2), res)
 ```
-```{r}
+```{r model 3 -- transofmred both + top code}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x2), .6*nrow(x2)) 
@@ -268,9 +268,10 @@ plot(fitted(l3), res)
 # Another round of top coding, this time for both k_mean and par_mean
 ```{r}
 x3 <- x2 %>%
-  mutate(k_mean = replace(k_mean, k_mean>=150000, 150000))
+  mutate(k_mean = replace(k_mean, k_mean>=150000, 150000)) %>%
+  mutate(par_mean = replace(par_mean, par_mean>=1000000, 1000000))
 ```
-```{r model 1 -- top code}
+```{r model 1 -- top code + weights}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x3), .6*nrow(x3)) 
@@ -295,7 +296,7 @@ plot(fitted(a1), res)
 
 # still bad.
 ```
-```{r model 2 -- top code + transformation}
+```{r model 2 -- top code + transformation + weights}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x3), .6*nrow(x3)) 
@@ -317,6 +318,50 @@ summary(a2)
 ```{r checking residuals}
 res <- resid(a2)
 plot(fitted(a2), res)
+```
+```{r interaction}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x3), .6*nrow(x3)) 
+training <- x3[index, ]
+test <- x3[-index, ]
+
+# creating test/train data split
+
+y <- lm(k_mean ~ par_mean*tier, data = training, weights = count)
+preds <- predict(y, test)
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+summary(y)
+```
+```{r}
+res <- resid(y)
+plot(fitted(y), res)
+```
+```{r}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x3), .6*nrow(x3)) 
+training <- x3[index, ]
+test <- x3[-index, ]
+
+# creating test/train data split
+
+fixed <- lm(k_mean ~ par_mean + tier + factor(cohort), data = training, weights = count)
+preds <- predict(fixed, test)
+
+eval <- cbind(test$k_mean, preds)
+colnames(eval) <- c('Actual', 'Predicted')
+eval <- as.data.frame(eval)
+eval
+
+summary(fixed)
+
+# fixed effects works great!!
 ```
 
 

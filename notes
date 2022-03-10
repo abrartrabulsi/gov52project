@@ -34,3 +34,12 @@ For whatever reason "density" gives the best predictive results of the three, bu
 
 *** address residual problem...without log transformations the residual plot is BAD even though the predictions are really good...with log transformations residual plot is passable but predictions are worse
 
+*** do I need to forecast for this project?
+
+3/7/2022 -- OH
+
+check out annual fixed effects
+
+linear is good for forecasting 
+
+Fixed effects works great!!
