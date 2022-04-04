@@ -43,3 +43,17 @@ check out annual fixed effects
 linear is good for forecasting 
 
 Fixed effects works great!!
+
+*** questions for next office hours: any more I should do to the model? 
+
+-- moving into the next segment -- how do I get the model to work in the shiny app (ie. user inputs parent income, college, year and algorithm spits out a result) 
+
+-- what are some visualizations I can do with predicted (and actual) results? I was thinking of trying to plot income values over 20 year period when user inputs their income, parent income, college etc
+
+-- how do i incorporate inflation into the model for specific years? 
+
+*** questions for next office hours
+
+-- i just noticed tier 1 is missing...that's the ivy tier but I never filtered it out? even in my earliest model tier 1 is left out of the output
+
+-- when I loaded in my data I made the tier variable a factor. In the model we made it a factor again, I should remove that right?

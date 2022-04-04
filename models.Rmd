@@ -36,6 +36,8 @@ eval <- cbind(test$k_mean, preds)
 colnames(eval) <- c('Actual', 'Predicted')
 eval <- as.data.frame(eval)
 eval
+
+m1
 ```
 ```{r model 2 -- logs}
 set.seed(100) # for reproducing results
@@ -351,17 +353,22 @@ test <- x3[-index, ]
 
 # creating test/train data split
 
-fixed <- lm(k_mean ~ par_mean + tier + factor(cohort), data = training, weights = count)
+fixed <- lm(k_mean ~ par_mean + factor(tier) + factor(cohort) + par_mean*factor(tier), data = training, weights = count)
 preds <- predict(fixed, test)
 
-eval <- cbind(test$k_mean, preds)
-colnames(eval) <- c('Actual', 'Predicted')
-eval <- as.data.frame(eval)
-eval
+eval1 <- cbind(test$k_mean, preds)
+colnames(eval1) <- c('Actual', 'Predicted')
+eval1 <- as.data.frame(eval1)
+eval1
 
 summary(fixed)
 
 # fixed effects works great!!
+```
+```{r}
+eval1 %>%
+  ggplot(aes(x = Predicted, y = Actual)) + geom_point()
+# scale these points by size of cohort
 ```
 
 
