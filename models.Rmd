@@ -11,6 +11,7 @@ library(ggplot2)
 library(haven)
 library(devtools)
 library(aggregress)
+library(readr)
 ```
 ```{r loading data}
 x <- read_dta("mrc_table8.dta")
@@ -369,6 +370,9 @@ summary(fixed)
 eval1 %>%
   ggplot(aes(x = Predicted, y = Actual)) + geom_point()
 # scale these points by size of cohort
+```
+```{r writing data file in for shiny app}
+data <- write_rds(x3,"shinyapp/x3.rds")
 ```
 
 
