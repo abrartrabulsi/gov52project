@@ -354,7 +354,7 @@ test <- x3[-index, ]
 
 # creating test/train data split
 
-fixed <- lm(k_mean ~ par_mean + factor(tier) + factor(cohort) + par_mean*factor(tier), data = training, weights = count)
+fixed <- lm(k_mean ~ par_mean + factor(tier) + factor(cohort), data = training, weights = count)
 preds <- predict(fixed, test)
 
 eval1 <- cbind(test$k_mean, preds)
@@ -373,6 +373,9 @@ eval1 %>%
 ```
 ```{r writing data file in for shiny app}
 data <- write_rds(x3,"shinyapp/x3.rds")
+```
+```{r}
+model <- write_rds(fixed, "shinyapp/fixed.rds")
 ```
 
 

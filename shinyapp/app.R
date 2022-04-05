@@ -14,29 +14,48 @@ library(readr)
 library(gganimate)
 library(vembedr)
 library(htmltools)
+library(tidyverse)
+library(dplyr)
 
 data <- read_rds("x3.rds")
+model <- read_rds("fixed.rds")
 ui <- fluidPage(theme = shinytheme("united"),
     
     br(),
     
     navbarPage("Postgraduate Income Calculator",
                
-               selectInput("tier_name", "College Attended:", levels(data$tier_name)))
+     # note that later when coding the server with the model, "tier" should correspond 
+     # with themodel input and work (+ make the drop-down work)
+               
+        selectInput("tier", "College Attended:", levels(data$tier_name))),
+        numericInput("par_mean", "Parent Income:", 0),
+        numericInput("cohort", "Year Born:", 0),
+        textOutput("predincome")
+    
+    # insert a field here for year graudated college for the purpose of inflation adjustment
+    # once you've figured out how to incorporate that into the model
+    
+    
 )
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
-
-    set.seed(100) # for reproducing results
+server <- function(input, output, server) {
     
-    index <- sample(1:nrow(x3), .6*nrow(x3)) 
-    training <- x3[index, ]
-    test <- x3[-index, ]
+    #x1 <- reactive({input$cohort})
+    #x2 <- reactive({input$tier})
+    #x3 <- reactive({input$par_mean})
     
-    # creating test/train data split
+    #df <- tibble(reactive(input$cohort), reactive(input$tier), reactive(input$par_mean))
     
-    model <- lm(k_mean ~ par_mean + factor(tier) + factor(cohort) + par_mean*factor(tier), data = training, weights = count)
+    df <- reactive({
+        
+        cohort = input$cohort
+        tier = input$tier
+        par_mean = input$par_mean
+    })
+    
+    output$predincome <- predict(model, df)
 }
 
 # Run the application 
