@@ -31,6 +31,7 @@ ui <- fluidPage(theme = shinytheme("united"),
         selectInput("tier", "College Attended:", levels(data$tier_name))),
         numericInput("par_mean", "Parent Income:", 0),
         numericInput("cohort", "Year Born:", 0),
+        actionButton("calc", label = "Calculate"),
         textOutput("predincome")
     
     # insert a field here for year graudated college for the purpose of inflation adjustment
@@ -55,9 +56,15 @@ server <- function(input, output, server) {
         cohort = input$cohort
         tier = input$tier
         par_mean = input$par_mean
+        
     })
     
-    output$predincome <- reactive(predict(model, df))
+    output$predincome <- eventReactive(input$calc, {predict(model, df)} )
+    
+    # the main problem here is trying to convert these reactive shiny values into
+    # values the function predict() and the model can understand and compute with
+    # you cannot reocncile reactive values and data frames, so I either need to find a way to
+    # work around this or I may need to abandon the calculator idea
 }
 
 # Run the application 
