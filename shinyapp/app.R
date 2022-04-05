@@ -26,7 +26,7 @@ ui <- fluidPage(theme = shinytheme("united"),
     navbarPage("Postgraduate Income Calculator",
                
      # note that later when coding the server with the model, "tier" should correspond 
-     # with themodel input and work (+ make the drop-down work)
+     # with the model input and work (+ make the drop-down work)
                
         selectInput("tier", "College Attended:", levels(data$tier_name))),
         numericInput("par_mean", "Parent Income:", 0),
@@ -41,6 +41,8 @@ ui <- fluidPage(theme = shinytheme("united"),
 
 # Define server logic required to draw a histogram
 server <- function(input, output, server) {
+ 
+# old but failed attempts at coding this. keeping in case this is useful in the future 
     
     #x1 <- reactive({input$cohort})
     #x2 <- reactive({input$tier})
@@ -55,7 +57,7 @@ server <- function(input, output, server) {
         par_mean = input$par_mean
     })
     
-    output$predincome <- predict(model, df)
+    output$predincome <- reactive(predict(model, df))
 }
 
 # Run the application 
