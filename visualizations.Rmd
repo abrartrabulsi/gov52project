@@ -1,0 +1,38 @@
+---
+title: "visualizations"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+```{r loading data}
+mydata <- read_rds("x3.rds")
+data <- read_rds("df.rds")
+```
+```{r loading in model info}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(mydata), .6*nrow(mydata)) 
+training <- mydata[index, ]
+test <- mydata[-index, ]
+
+# creating test/train data split
+
+fixed <- lm(k_mean ~ par_mean + factor(tier) + factor(cohort), data = training, weights = count)
+preds <- predict(fixed, test)
+
+eval1 <- cbind(test$k_mean, preds)
+colnames(eval1) <- c('Actual', 'Predicted')
+eval1 <- as.data.frame(eval1)
+```
+```{r actual vs predicted with scale for cohort size}
+data %>%
+  ggplot(aes(y = preds, x = k_mean, size = count)) +
+  geom_point() 
+```
+
+

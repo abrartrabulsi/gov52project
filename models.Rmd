@@ -357,7 +357,7 @@ test <- x3[-index, ]
 fixed <- lm(k_mean ~ par_mean + factor(tier) + factor(cohort), data = training, weights = count)
 preds <- predict(fixed, test)
 
-eval1 <- cbind(test$k_mean, preds)
+eval1 <- cbind(test, preds)
 colnames(eval1) <- c('Actual', 'Predicted')
 eval1 <- as.data.frame(eval1)
 eval1
@@ -376,6 +376,12 @@ data <- write_rds(x3,"shinyapp/x3.rds")
 ```
 ```{r}
 model <- write_rds(fixed, "shinyapp/fixed.rds")
+```
+```{r}
+data <- write_rds(x3,"gov52project/data.rds")
+```
+```{r}
+df <- write_rds(eval1, "shinyapp/df.rds")
 ```
 
 
