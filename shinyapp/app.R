@@ -28,13 +28,13 @@ ui <- fluidPage(theme = shinytheme("united"),
      # note that later when coding the server with the model, "tier" should correspond 
      # with the model input and work (+ make the drop-down work)
     
-    sidebarPanel(
+   # sidebarPanel(
         
          selectInput("tier", "College Attended:", levels(data$tier))),
          numericInput("par_mean", "Parent Income:", 0),
          numericInput("cohort", "Year Born:", 0),
          #actionButton("calc", label = "Calculate"),
-         textOutput("predincome"))
+         textOutput("predincome")#)
     
     # insert a field here for year graudated college for the purpose of inflation adjustment
     # once you've figured out how to incorporate that into the model
@@ -61,9 +61,10 @@ server <- function(input, output) {
         
     #})
     
-    output <- reactive({predict(model, newdata = df())})
-    output$predincome <- renderText({output()})
-    #output$predincome <- eventReactive(input$calc, {predict(model, df)} )
+    hi <- reactive({predict(model, newdata = df())})
+    output$predincome <- renderText({hi()})
+    #output$predincome <- eventReactive(input$calc, {predict(model, newdata = df())} )
+    #output$predincome <- eventReactive(input$calc, renderText({hi()}))
     
     # the main problem here is trying to convert these reactive shiny values into
     # values the function predict() and the model can understand and compute with
