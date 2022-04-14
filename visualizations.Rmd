@@ -29,10 +29,6 @@ eval1 <- cbind(test$k_mean, preds)
 colnames(eval1) <- c('Actual', 'Predicted')
 eval1 <- as.data.frame(eval1)
 ```
-```{r actual vs predicted with scale for cohort size}
-data %>%
-  ggplot(aes(y = preds, x = k_mean, size = count)) +
-  geom_point() 
-```
+
 
 

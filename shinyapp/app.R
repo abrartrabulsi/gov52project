@@ -11,8 +11,6 @@ library(shiny)
 library(shinythemes)
 library(plotly)
 library(readr)
-library(gganimate)
-library(vembedr)
 library(htmltools)
 library(tidyverse)
 library(dplyr)
@@ -23,48 +21,48 @@ ui <- fluidPage(theme = shinytheme("united"),
     
     br(),
     
-    navbarPage("Postgraduate Income Calculator",
+    navbarPage("Title",
                
      # note that later when coding the server with the model, "tier" should correspond 
      # with the model input and work (+ make the drop-down work)
     
-   # sidebarPanel(
+    tabsetPanel(
         
-         selectInput("tier", "College Attended:", levels(data$tier))),
+        tabPanel("Postgraduate Income Calculator",
+       
+       sidebarPanel(
+        
+         selectInput("tier", "College Attended:", choices = data$tier)),
          numericInput("par_mean", "Parent Income:", 0),
          numericInput("cohort", "Year Born:", 0),
          #actionButton("calc", label = "Calculate"),
-         textOutput("predincome")#)
+         #textOutput("predincome")
     
     # insert a field here for year graudated college for the purpose of inflation adjustment
     # once you've figured out how to incorporate that into the model
+        ))),
+   
+   mainPanel(
+       
+       textOutput("predincome")
+       
+   )
+    
     
     
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
- 
-# old but failed attempts at coding this. keeping in case this is useful in the future 
     
-    #x1 <- reactive({input$cohort})
-    #x2 <- reactive({input$tier})
-    #x3 <- reactive({input$par_mean})
     
     df <- reactive(data.frame("cohort" = input$cohort, "tier" = input$tier, "par_mean" = input$par_mean))
     
-    #df <- reactive({
-        
-        #cohort = input$cohort
-        #tier = input$tier
-        #par_mean = input$par_mean
-        
-    #})
     
-    hi <- reactive({predict(model, newdata = df())})
-    output$predincome <- renderText({hi()})
+    x <- reactive({predict(model, newdata = df())})
+    output$predincome <- renderText({x()})
     #output$predincome <- eventReactive(input$calc, {predict(model, newdata = df())} )
-    #output$predincome <- eventReactive(input$calc, renderText({hi()}))
+    #output$predincome <- eventReactive(input$calc, {renderText({x()})})
     
     # the main problem here is trying to convert these reactive shiny values into
     # values the function predict() and the model can understand and compute with

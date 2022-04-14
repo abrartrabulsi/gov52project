@@ -106,7 +106,7 @@ x1 <- x %>%
 # for whatever reason R wasn't filtering everything properly when I tried to pass multiple "or" arguments with | 
 ```
 # Linear models with filtered data (variables of interest)
-```{r model 1 -- basic}
+```{r model 1 -- basic, with cleaning}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x1), .6*nrow(x1)) 
@@ -129,7 +129,7 @@ summary(n1)
 
 # rsquared is pretty decent too :)
 ```
-```{r model 2 -- weights (???)}
+```{r model 2 -- weights, with cleaning}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x1), .6*nrow(x1)) 
@@ -161,7 +161,7 @@ plot(fitted(n2), res)
 
 # this residual plot...omg...this is a mess. this needs to be transformed
 ```
-```{r model 3 -- transformed + weights}
+```{r model 3 -- transformed + weights, with cleaning}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x1), .6*nrow(x1)) 
@@ -195,7 +195,7 @@ x2 %>%
   ggplot(aes(x = par_mean)) +
   geom_histogram()
 ```
-```{r model 1 -- top coded}
+```{r model 1 -- top coded, basic}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x2), .6*nrow(x2)) 
@@ -220,7 +220,7 @@ plot(fitted(l1), res)
 
 # still bad
 ```
-```{r model 2 -- top code + transform dep}
+```{r model 2 -- top code + transform dep var}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x2), .6*nrow(x2)) 
@@ -274,7 +274,7 @@ x3 <- x2 %>%
   mutate(k_mean = replace(k_mean, k_mean>=150000, 150000)) %>%
   mutate(par_mean = replace(par_mean, par_mean>=1000000, 1000000))
 ```
-```{r model 1 -- top code + weights}
+```{r model 1 -- both top code + weights}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x3), .6*nrow(x3)) 
@@ -299,7 +299,7 @@ plot(fitted(a1), res)
 
 # still bad.
 ```
-```{r model 2 -- top code + transformation + weights}
+```{r model 2 -- both top code + transformation + weights}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x3), .6*nrow(x3)) 
@@ -322,7 +322,7 @@ summary(a2)
 res <- resid(a2)
 plot(fitted(a2), res)
 ```
-```{r interaction}
+```{r both top code, weights, interaction}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x3), .6*nrow(x3)) 
@@ -345,7 +345,7 @@ summary(y)
 res <- resid(y)
 plot(fitted(y), res)
 ```
-```{r}
+```{r both top coded, weights, fixed effects}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x3), .6*nrow(x3)) 
@@ -357,7 +357,7 @@ test <- x3[-index, ]
 fixed <- lm(k_mean ~ par_mean + factor(tier) + factor(cohort), data = training, weights = count)
 preds <- predict(fixed, test)
 
-eval1 <- cbind(test, preds)
+eval1 <- cbind(test$k_mean, preds)
 colnames(eval1) <- c('Actual', 'Predicted')
 eval1 <- as.data.frame(eval1)
 eval1
@@ -374,15 +374,6 @@ eval1 %>%
 ```{r writing data file in for shiny app}
 data <- write_rds(x3,"shinyapp/x3.rds")
 ```
-```{r}
+```{r writing in model for shiny}
 model <- write_rds(fixed, "shinyapp/fixed.rds")
 ```
-```{r}
-data <- write_rds(x3,"gov52project/data.rds")
-```
-```{r}
-df <- write_rds(eval1, "shinyapp/df.rds")
-```
-
-
-
