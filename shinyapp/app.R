@@ -36,38 +36,38 @@ ui <- fluidPage(theme = shinytheme("united"),
          numericInput("par_mean", "Parent Income:", 0),
          numericInput("cohort", "Year Born:", 0),
          #actionButton("calc", label = "Calculate"),
-         textOutput("predincome")
+         #textOutput("predincome")
     
     # insert a field here for year graudated college for the purpose of inflation adjustment
     # once you've figured out how to incorporate that into the model
         ))),
    
-   #mainPanel(
+   mainPanel(
        
        textOutput("predincome")
        
-   #)#,
+   ),
    
-   #tabsetPanel(
+   tabsetPanel(
        
-       #tabPanel(
+       tabPanel(
            
-           #"Change in Post-Graduate Income Over Time",
+           "Change in Post-Graduate Income Over Time",
            
-           #sidebarPanel(
+           sidebarPanel(
                
-               #selectInput("tiername", "College Attended", choices = data$tier_name),
-               #selectInput("parventile", "Parent Income", choices = data$par_ventile),
+               selectInput("tiername", "College Attended", choices = data$tier_name),
+               selectInput("parventile", "Parent Income", choices = data$par_ventile),
                
           
-           #)
-       #)
-   #),
+           )
+       )
+   ),
     
-    #mainPanel(
+    mainPanel(
         
-        #plotlyOutput("PostPlotly")
-    #)
+        plotlyOutput("PostPlotly")
+    )
     
 )
 
@@ -99,7 +99,7 @@ server <- function(input, output) {
             filter(tier_name == input$tiername) %>%
             filter(par_ventile == input$parventile) %>%
             ggplot(aes(x = cohort, y = k_mean)) + 
-            geom_col()
+            geom_line()
             
        )
     })
