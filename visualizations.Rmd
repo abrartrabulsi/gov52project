@@ -29,6 +29,13 @@ eval1 <- cbind(test$k_mean, preds)
 colnames(eval1) <- c('Actual', 'Predicted')
 eval1 <- as.data.frame(eval1)
 ```
+```{r making a graph}
+mydata %>%
+  group_by(cohort) %>%
+  ggplot(aes(x = cohort, y = k_mean)) + 
+  geom_col() +
+  facet_wrap(~tier)
+```
 
 
 

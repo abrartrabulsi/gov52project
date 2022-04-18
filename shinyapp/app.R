@@ -36,19 +36,38 @@ ui <- fluidPage(theme = shinytheme("united"),
          numericInput("par_mean", "Parent Income:", 0),
          numericInput("cohort", "Year Born:", 0),
          #actionButton("calc", label = "Calculate"),
-         #textOutput("predincome")
+         textOutput("predincome")
     
     # insert a field here for year graudated college for the purpose of inflation adjustment
     # once you've figured out how to incorporate that into the model
         ))),
    
-   mainPanel(
+   #mainPanel(
        
        textOutput("predincome")
        
-   )
+   #)#,
+   
+   #tabsetPanel(
+       
+       #tabPanel(
+           
+           #"Change in Post-Graduate Income Over Time",
+           
+           #sidebarPanel(
+               
+               #selectInput("tiername", "College Attended", choices = data$tier_name),
+               #selectInput("parventile", "Parent Income", choices = data$par_ventile),
+               
+          
+           #)
+       #)
+   #),
     
-    
+    #mainPanel(
+        
+        #plotlyOutput("PostPlotly")
+    #)
     
 )
 
@@ -61,6 +80,7 @@ server <- function(input, output) {
     
     x <- reactive({predict(model, newdata = df())})
     output$predincome <- renderText({x()})
+    
     #output$predincome <- eventReactive(input$calc, {predict(model, newdata = df())} )
     #output$predincome <- eventReactive(input$calc, {renderText({x()})})
     
@@ -69,6 +89,21 @@ server <- function(input, output) {
     # you cannot reocncile reactive values and data frames, so I either need to find a way to
     # work around this or I may need to abandon the calculator idea
     
+    # the fix was to make sure everything is rendered as a reactive value
+    
+    output$PostPlotly <- renderPlotly({
+        
+       ggplotly(data %>%
+                    
+            group_by(cohort) %>%
+            filter(tier_name == input$tiername) %>%
+            filter(par_ventile == input$parventile) %>%
+            ggplot(aes(x = cohort, y = k_mean)) + 
+            geom_col()
+            
+       )
+    })
+        
     
 }
 
