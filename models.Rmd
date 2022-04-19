@@ -377,3 +377,21 @@ data <- write_rds(x3,"shinyapp/x3.rds")
 ```{r writing in model for shiny}
 model <- write_rds(fixed, "shinyapp/fixed.rds")
 ```
+```{r creating data frame fo final model preds + og df}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x3), .6*nrow(x3)) 
+training <- x3[index, ]
+test <- x3[-index, ]
+
+# creating test/train data split
+
+fixed <- lm(k_mean ~ par_mean + factor(tier) + factor(cohort), data = training, weights = count)
+preds <- predict(fixed, test)
+
+full <- cbind(test, preds)
+```
+```{r writing this data in}
+full <- write_rds(full,"shinyapp/full.rds")
+```
+

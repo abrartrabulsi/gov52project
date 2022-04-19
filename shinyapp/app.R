@@ -17,6 +17,7 @@ library(dplyr)
 
 data <- read_rds("x3.rds")
 model <- read_rds("fixed.rds")
+fulldata <- read_rds("full.rds")
 ui <- fluidPage(theme = shinytheme("united"),
     
     br(),
@@ -36,7 +37,7 @@ ui <- fluidPage(theme = shinytheme("united"),
          numericInput("par_mean", "Parent Income:", 0),
          numericInput("cohort", "Year Born:", 0),
          #actionButton("calc", label = "Calculate"),
-         #textOutput("predincome")
+        
     
     # insert a field here for year graudated college for the purpose of inflation adjustment
     # once you've figured out how to incorporate that into the model
@@ -60,13 +61,21 @@ ui <- fluidPage(theme = shinytheme("united"),
                selectInput("parventile", "Parent Income", choices = data$par_ventile),
                
           
+           ),
+           
+           sidebarPanel(
+               
+               selectInput("tiername2", "College Attended", choices = data$tier_name),
+               selectInput("parventile2", "Parent Income", choices = data$par_ventile)
            )
        )
    ),
     
     mainPanel(
         
-        plotlyOutput("PostPlotly")
+        plotlyOutput("PostPlotly"),
+        
+        plotlyOutput("PostPlotly2")
     )
     
 )
@@ -93,15 +102,30 @@ server <- function(input, output) {
     
     output$PostPlotly <- renderPlotly({
         
-       ggplotly(data %>%
+       ggplotly(fulldata %>%
                     
             group_by(cohort) %>%
             filter(tier_name == input$tiername) %>%
             filter(par_ventile == input$parventile) %>%
-            ggplot(aes(x = cohort, y = k_mean)) + 
-            geom_line()
+            ggplot(aes(x = cohort, y = preds)) + 
+            geom_line() +
+            scale_x_reverse()
             
        )
+    })
+    
+    output$PostPlotly2 <- renderPlotly({
+        
+        ggplotly(fulldata %>%
+                     
+                     group_by(cohort) %>%
+                     filter(tier_name == input$tiername2) %>%
+                     filter(par_ventile == input$parventile2) %>%
+                     ggplot(aes(x = cohort, y = preds)) + 
+                     geom_line() +
+                     scale_x_reverse()
+                 
+        )
     })
         
     
