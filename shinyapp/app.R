@@ -18,55 +18,62 @@ library(dplyr)
 data <- read_rds("x3.rds")
 model <- read_rds("fixed.rds")
 fulldata <- read_rds("full.rds")
+noparent <- read_rds("noparent.rds")
 ui <- fluidPage(theme = shinytheme("united"),
     
     br(),
     
-    navbarPage("Title",
+    navbarPage("Post-Graduate Earning Potential",
                
      # note that later when coding the server with the model, "tier" should correspond 
      # with the model input and work (+ make the drop-down work)
     
-    tabsetPanel(
+    #tabsetPanel(
         
-        tabPanel("Postgraduate Income Calculator",
+        #tabPanel("Postgraduate Income Calculator",
        
-       sidebarPanel(
+       #sidebarPanel(
         
-         selectInput("tier", "College Attended:", choices = data$tier)),
-         numericInput("par_mean", "Parent Income:", 0),
-         numericInput("cohort", "Year Born:", 0),
+         #selectInput("tier", "College Attended:", choices = data$tier)),
+         #numericInput("par_mean", "Parent Income:", 0),
+         #numericInput("cohort", "Year Born:", 0),
          #actionButton("calc", label = "Calculate"),
         
     
     # insert a field here for year graudated college for the purpose of inflation adjustment
     # once you've figured out how to incorporate that into the model
-        ))),
+        #)),
    
-   mainPanel(
+   #mainPanel(
        
-       textOutput("predincome")
+       #textOutput("predincome")
        
-   ),
+   #),
    
    tabsetPanel(
        
        tabPanel(
            
-           "Change in Post-Graduate Income Over Time",
+           "Interactive Visualizations",
+           
+           h3("Comparing Post-Graduate Earning Potential"),
+           
+           h5("*All predicted values for those born between 1980 & 1991 ie. graduated between 2002 & 2014"),
+           
+           h6("**Each ventile is a 5 percentile range, and 99 represents the 99th percentile"),
            
            sidebarPanel(
                
-               selectInput("tiername", "College Attended", choices = data$tier_name),
-               selectInput("parventile", "Parent Income", choices = data$par_ventile),
+               selectInput("tiername", "College Attended", choices = fulldata$tier_name),
+               selectInput("parventile", "Parent Income", choices = fulldata$par_ventile),
                
           
            ),
            
            sidebarPanel(
                
-               selectInput("tiername2", "College Attended", choices = data$tier_name),
-               selectInput("parventile2", "Parent Income", choices = data$par_ventile)
+               selectInput("tiername2", "College Attended", choices = fulldata$tier_name),
+               selectInput("parventile2", "Parent Income", choices = fulldata$par_ventile)
            )
        )
    ),
@@ -76,19 +83,50 @@ ui <- fluidPage(theme = shinytheme("united"),
         plotlyOutput("PostPlotly"),
         
         plotlyOutput("PostPlotly2")
-    )
+    ),
+   
+   tabsetPanel(
+       
+        tabPanel(
+           
+            "Parental Impact",
+            
+            h3("Visualizing the Impact of Parental Income on Post-graduate Earning Potential"),
+            h5("*All predicted values for those born between 1980 & 1991 ie. graduated between 2002 & 2014"),
+            h6("**Each ventile is a 5 percentile range, and 99 represents the 99th percentile"),
+            
+            sidebarPanel(
+                
+                selectInput("college1", "College Attended", choices = fulldata$tier_name),
+                selectInput("pincome", "Parent Income", choices = fulldata$par_ventile)
+            
+            ),
+            
+            sidebarPanel(
+                
+                selectInput("college2", "College Attended", choices = noparent$tier_name)
+            )
+       )
+   ),
+   
+   mainPanel(
+       
+       plotlyOutput("ParentPlotly1"),
+       
+       plotlyOutput("ParentPlotly2")
+   )
     
-)
+))
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
     
     
-    df <- reactive(data.frame("cohort" = input$cohort, "tier" = input$tier, "par_mean" = input$par_mean))
+    #df <- reactive(data.frame("cohort" = input$cohort, "tier" = input$tier, "par_mean" = input$par_mean))
     
     
-    x <- reactive({predict(model, newdata = df())})
-    output$predincome <- renderText({x()})
+    #x <- reactive({predict(model, newdata = df())})
+    #output$predincome <- renderText({x()})
     
     #output$predincome <- eventReactive(input$calc, {predict(model, newdata = df())} )
     #output$predincome <- eventReactive(input$calc, {renderText({x()})})
@@ -109,9 +147,10 @@ server <- function(input, output) {
             filter(par_ventile == input$parventile) %>%
             ggplot(aes(x = cohort, y = preds)) + 
             geom_line() +
-            scale_x_reverse()
+            scale_x_reverse() +
+            labs(x = "Child Birth Year", y = "Predicted Income")
             
-       )
+            )
     })
     
     output$PostPlotly2 <- renderPlotly({
@@ -122,6 +161,34 @@ server <- function(input, output) {
                      filter(tier_name == input$tiername2) %>%
                      filter(par_ventile == input$parventile2) %>%
                      ggplot(aes(x = cohort, y = preds)) + 
+                     geom_line() +
+                     scale_x_reverse() +
+                     labs(x = "Child Birth Year", y = "Predicted Income")
+                 
+        )
+    })
+    
+    output$ParentPlotly1 <- renderPlotly({
+        
+        ggplotly(fulldata %>%
+                     
+                     group_by(cohort) %>%
+                     filter(tier_name == input$college1) %>%
+                     filter(par_ventile == input$pincome) %>%
+                     ggplot(aes(x = cohort, y = preds)) +
+                     geom_line() +
+                     scale_x_reverse()
+                 
+                 )
+    })
+    
+    output$ParentPlotly2 <- renderPlotly({
+        
+        ggplotly(noparent %>%
+                     
+                     group_by(cohort) %>%
+                     filter(tier_name == input$college2) %>%
+                     ggplot(aes(x = cohort, y = preds)) +
                      geom_line() +
                      scale_x_reverse()
                  

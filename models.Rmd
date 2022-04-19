@@ -394,4 +394,22 @@ full <- cbind(test, preds)
 ```{r writing this data in}
 full <- write_rds(full,"shinyapp/full.rds")
 ```
+```{r making a model without parental income for comparison}
+set.seed(100) # for reproducing results
+
+index <- sample(1:nrow(x3), .6*nrow(x3)) 
+training <- x3[index, ]
+test <- x3[-index, ]
+
+# creating test/train data split
+
+nparent <- lm(k_mean ~ factor(tier) + factor(cohort), data = training, weights = count)
+
+preds <- predict(noparent, test)
+
+noparent <- cbind(test, preds)
+```
+```{r}
+noparent <- write_rds(noparent, "shinyapp/noparent.rds")
+```
 

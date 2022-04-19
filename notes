@@ -57,3 +57,13 @@ Fixed effects works great!!
 -- i just noticed tier 1 is missing...that's the ivy tier but I never filtered it out? even in my earliest model tier 1 is left out of the output
 
 -- when I loaded in my data I made the tier variable a factor. In the model we made it a factor again, I should remove that right?
+
+04/12/2022
+
+questions for charles:
+
+1. how do i apply cohort as a factor but have it work for years outside the data set (factor(cohort) has better predictions vs it not being a factor)
+
+2. what else can i include here for my model/final presentation?
+
+3. how do I incorporate inflation into this?
