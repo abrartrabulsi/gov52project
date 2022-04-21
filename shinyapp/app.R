@@ -19,7 +19,7 @@ data <- read_rds("x3.rds")
 model <- read_rds("fixed.rds")
 fulldata <- read_rds("full.rds")
 noparent <- read_rds("noparent.rds")
-ui <- fluidPage(theme = shinytheme("united"),
+ui <- fluidPage(theme = shinytheme("flatly"),
     
     br(),
     
@@ -114,7 +114,65 @@ ui <- fluidPage(theme = shinytheme("united"),
        plotlyOutput("ParentPlotly1"),
        
        plotlyOutput("ParentPlotly2")
-   )
+   ),
+   
+   tabsetPanel(
+       
+       tabPanel(
+           
+           "Model",
+           
+           h3("Statistical Information on the Model"),
+           
+           imageOutput("summary"),
+           
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           br(),
+           
+           textOutput("texta"))),
+           
+    tabsetPanel(
+        
+        tabPanel(
+            
+            "About",
+            
+            h3("Motivations"),
+            
+            textOutput("motivations"),
+            
+            br(),
+            
+            h3("The Data"),
+            
+            textOutput("thedata"),
+            
+            br(),
+            
+            h3("Purpose"),
+            
+            textOutput("purpose")
+            
+        )
+    )
+           
+          
     
 ))
 
@@ -194,7 +252,45 @@ server <- function(input, output) {
                  
         )
     })
+    
+    output$summary <- renderImage({
         
+        
+        list(src = "summary.png",
+             contentType = "image",
+             width = 600,
+             height = 800)
+        
+        
+    }, deleteFile = FALSE)
+    
+    output$texta <- renderText({
+        
+        "A linear model was used to make predictions about the data. The model was weighted, featured two fixed
+        effects, and no interaction variables. With an R-squared value of .86,
+        the model is effective at making accurate predictions."
+    })
+    
+    output$motivations <- renderText({
+        
+        "There is plenty of data and information about the impact of college on personal financial outcomes.
+        However, the impact of parental income on personal financial outcomes has not been studied nearly as much.
+        This model is able to visually illustrate just how impactful parental income is on an individual's
+        earning potential."
+    })
+    
+    output$thedata <- renderText({
+        
+        "The data used in this model came from Opportunity Insights, and was used in the study, 'Income Segregation and Intergenerational Mobility Across Colleges in the United States'. 
+        In these data, the participants were born between 1980 and 1991, and all interviewed in 2014. The reason why this model can be used to
+        acertain earning potential, is because the individuals' incomes were recorded when they were various ages. However,
+        also due to the nature of these data, the model is unable to effectively extrapolate outside of the included years."
+    })
+    
+    output$purpose <- renderText({
+        
+        "This Shiny App was originally created as the final project deliverable for ths class Gov52: Models taught by Andrew Therriault."
+    })
     
 }
 

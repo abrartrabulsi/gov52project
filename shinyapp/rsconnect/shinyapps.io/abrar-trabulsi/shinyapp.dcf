@@ -1,0 +1,13 @@
+name: shinyapp
+title: shinyapp
+username:
+account: abrar-trabulsi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6136956
+bundleId: 5820612
+url: https://abrar-trabulsi.shinyapps.io/shinyapp/
+when: 1650507266.20875
+lastSyncTime: 1650507266.20877
+asMultiple: FALSE
+asStatic: FALSE
