@@ -23,7 +23,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
     
     br(),
     
-    navbarPage("Post-Graduate Earning Potential",
+navbarPage("Post-Graduate Earning Potential",
                
      # note that later when coding the server with the model, "tier" should correspond 
      # with the model input and work (+ make the drop-down work)
@@ -50,12 +50,16 @@ ui <- fluidPage(theme = shinytheme("flatly"),
        
    #),
    
-   tabsetPanel(
+   tabPanel(
        
-       tabPanel(
+       "Interactive Visualizations",
+       
+       tabsetPanel(
            
-           "Interactive Visualizations",
-           
+           tabPanel(
+                
+               "Post Graduate Earning Potential",
+                          
            h3("Comparing Post-Graduate Earning Potential"),
            
            h5("*All predicted values for those born between 1980 & 1991 ie. graduated between 2002 & 2014"),
@@ -74,18 +78,14 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                
                selectInput("tiername2", "College Attended", choices = fulldata$tier_name),
                selectInput("parventile2", "Parent Income", choices = fulldata$par_ventile)
-           )
-       )
-   ),
+           ),
     
     mainPanel(
         
         plotlyOutput("PostPlotly"),
         
         plotlyOutput("PostPlotly2")
-    ),
-   
-   tabsetPanel(
+    )),
        
         tabPanel(
            
@@ -106,15 +106,18 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 
                 selectInput("college2", "College Attended", choices = noparent$tier_name)
             )
-       )
-   ),
+       ),
    
    mainPanel(
        
        plotlyOutput("ParentPlotly1"),
        
        plotlyOutput("ParentPlotly2")
-   ),
+   ))),
+   
+   tabPanel(
+       
+       "Model Information",
    
    tabsetPanel(
        
@@ -122,30 +125,36 @@ ui <- fluidPage(theme = shinytheme("flatly"),
            
            "Model",
            
-           h3("Statistical Information on the Model"),
+           h3("Model Output"),
            
-           imageOutput("summary"),
+           imageOutput("summary")),
            
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
-           br(),
+       
+       tabPanel(
            
-           textOutput("texta"))),
+           "Model Fit",
+           
+           h3("Actual vs. Predicted Values & Linear Fit"),
+           
+           imageOutput("avsp")
+           
+          
+       ),
+       
+       tabPanel(
+           
+           "Analysis",
+           
+           h3("Commentary About the Model"),
+           
+           textOutput("texta")
+       )
+       
+       )),
+   
+   tabPanel(
+       
+       "About",
            
     tabsetPanel(
         
@@ -171,6 +180,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
             
         )
     )
+    
+   )
            
           
     
@@ -291,6 +302,17 @@ server <- function(input, output) {
         
         "This Shiny App was originally created as the final project deliverable for ths class Gov52: Models taught by Andrew Therriault."
     })
+    
+    output$avsp <- renderImage({
+        
+        
+        list(src = "actualvspredicted.png",
+             contentType = "image",
+             width = 800,
+             height = 600)
+        
+        
+    }, deleteFile = FALSE)
     
 }
 

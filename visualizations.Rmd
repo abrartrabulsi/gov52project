@@ -36,6 +36,13 @@ mydata %>%
   geom_col() +
   facet_wrap(~tier)
 ```
+```{r making a residual plot}
+data %>%
+  ggplot(aes(x = k_mean, y = preds, size = count)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(title = "Actual Values vs Predicted Values", x = "Actual", y = "Predicted", subtitle = "Weighted values based on cohort size")
+```
 
 
 
