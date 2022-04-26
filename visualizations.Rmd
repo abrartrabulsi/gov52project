@@ -38,7 +38,7 @@ mydata %>%
 ```
 ```{r making a residual plot}
 data %>%
-  ggplot(aes(x = k_mean, y = preds, size = count)) +
+  ggplot(aes(x = k_mean, y = preds, size = count, color = cohort)) +
   geom_point() +
   geom_smooth(method = "lm") +
   labs(title = "Actual Values vs Predicted Values", x = "Actual", y = "Predicted", subtitle = "Weighted values based on cohort size")
