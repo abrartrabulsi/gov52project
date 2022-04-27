@@ -168,6 +168,12 @@ navbarPage("Post-Graduate Earning Potential",
             
             br(),
             
+            h3("College & Class Mobility"),
+            
+            textOutput("use"),
+            
+            br(),
+            
             h3("The Data"),
             
             textOutput("thedata"),
@@ -338,6 +344,30 @@ server <- function(input, output) {
         
         "My name is Abrar Trabulsi, and I am a junior at Harvard College studying Government and Data Science. If you have
         any questions about this project, you can email me at: abrartrabulsi@college.harvard.edu"
+    })
+    
+    output$use <- renderText({
+        
+        "These predictions, and subsequent plots, can clearly deliniate the impact of parental income on post-graduate
+        earning potential even while holding factors like college attended constant. The drastic difference parental income makes is
+        unsurprising, but sobering. For example, those who went to an Ivy League school and come from the first vential, or the bottom 5%
+        in this country, the predicted income range is between $73,000 and $87,000 over a 12 year period, while for those from the 20th ventila,
+        or the top 5% in this country, that range automatically jumps to $75,000 to $107,000. What's interesting, is how both theoretical individuals would
+        start at basically the same income level, but over the years, those from the top 5% would end up making $20,000 more on average than those of the bottom
+        5%. Often times scholarship, and calculators like the College Scoreboard do not include parental income in their reports on the relationship between
+        college attended and post-graduate income. Clearly, this is an important factor to consider, and you don't need to look at this
+        kind of data to know that. Seeing it quantified, plotted, is of course, important. Looking at these numbers makes you wonder how
+        real or accessible the American Dream really is. The numbers I gave are just for the Ivy League, long ahiled as symbols of the American Dream.
+        Not everyone gets into the Ivy League of course. This year admissions rates across schools were at record lows, with Harard only accepting 4.6% of applicants overall.
+        People aren't getting into the Ivy League, and the working class, and the poor are especially not, not when a quarter of the class of 2025 comes from the
+        top 5%, and the financial makeup of other classes is not much different. So what of the vast majority who don't have access
+        to the Ivy League, but have hopes of class mobility? For those who went to a non-selective public school and are from the bottom 5%, their predicted income over 
+        a 12 year period ranges from $14,000 to $43,000 while those who went to the same school but whose parents are in the top 5% have a predicted income of $27,000 to $53,000
+        over a 12 year period. These individuals begin with a $13,000 average difference in income, and end with a $10,000 averga edifference in income. The individual whose parents are
+        from the bottom 5% did experience class mobility, albeit not American Dream levels of attaining riches after years of hard work. The person who was at the
+        bottom 5% likely doesn't have the same financial supports, like an inheritance, a family with money to help in the event of crisis, etc. Class mobility still exists, but it does not account for the
+        very real differences generational wealth plays in outcomes despite similarities like college attended, and the very real and increasingly brutal reality the working class, and poor
+        live."
     })
     
     
