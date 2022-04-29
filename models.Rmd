@@ -12,6 +12,10 @@ library(haven)
 library(devtools)
 library(aggregress)
 library(readr)
+
+# to get to the final model, scorll to line 358. This code is my original interative code
+# showing the process I went through to get to the final model
+
 ```
 ```{r loading data}
 x <- read_dta("mrc_table8.dta")
@@ -75,6 +79,7 @@ eval3 <- cbind(test$k_mean, preds3)
 colnames(eval3) <- c('Actual', 'Predicted')
 eval3 <- as.data.frame(eval3)
 eval3
+
 # the model has only been slightly improved with the introduction of an interaction term
 ```
 ```{r trying with weights?}
@@ -86,13 +91,15 @@ test <- x[-index, ]
 
 # creating test/train data split
 
-m4 <- lm(k_mean ~ par_mean + tier, data = training, weights = density)
+m4 <- lm(k_mean ~ par_mean + tier, data = training, weights = count)
 preds <- predict(m4, test)
 
 eval <- cbind(test$k_mean, preds)
 colnames(eval) <- c('Actual', 'Predicted')
 eval <- as.data.frame(eval)
 eval
+
+# model is improved with weights
 ```
 ```{r some more data cleaning}
 x1 <- x %>%
@@ -160,6 +167,8 @@ res <- resid(n2)
 plot(fitted(n2), res)
 
 # this residual plot...omg...this is a mess. this needs to be transformed
+
+# coming back to this, it's not actually THAT bad
 ```
 ```{r model 3 -- transformed + weights, with cleaning}
 set.seed(100) # for reproducing results
@@ -220,7 +229,7 @@ plot(fitted(l1), res)
 
 # still bad
 ```
-```{r model 2 -- top code + transform dep var}
+```{r model 2 -- top code + transform dependent variable}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x2), .6*nrow(x2)) 
@@ -377,7 +386,7 @@ data <- write_rds(x3,"shinyapp/x3.rds")
 ```{r writing in model for shiny}
 model <- write_rds(fixed, "shinyapp/fixed.rds")
 ```
-```{r creating data frame fo final model preds + og df}
+```{r creating data frame of final model preds + original df}
 set.seed(100) # for reproducing results
 
 index <- sample(1:nrow(x3), .6*nrow(x3)) 
@@ -391,7 +400,7 @@ preds <- predict(fixed, test)
 
 full <- cbind(test, preds)
 ```
-```{r writing this data in}
+```{r writing this data in for the shiny app}
 full <- write_rds(full,"shinyapp/full.rds")
 ```
 ```{r making a model without parental income for comparison}
@@ -409,7 +418,7 @@ preds <- predict(noparent, test)
 
 noparent <- cbind(test, preds)
 ```
-```{r}
+```{r writing in this model for the shiny app}
 noparent <- write_rds(noparent, "shinyapp/noparent.rds")
 ```
 
