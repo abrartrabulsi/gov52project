@@ -5,9 +5,9 @@ account: abrar-trabulsi
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6136956
-bundleId: 5820612
+bundleId: 5852689
 url: https://abrar-trabulsi.shinyapps.io/shinyapp/
-when: 1650507266.20875
-lastSyncTime: 1650507266.20877
+when: 1651263984.72401
+lastSyncTime: 1651263984.72402
 asMultiple: FALSE
 asStatic: FALSE
